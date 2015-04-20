@@ -23,7 +23,7 @@
 #define AppExtensionFieldsKey                     @"fields"
 #define AppExtensionReturnedFieldsKey             @"returned_fields"
 #define AppExtensionOldPasswordKey                @"old_password"
-#define AppExtensionPasswordGereratorOptionsKey   @"password_generator_options"
+#define AppExtensionPasswordGeneratorOptionsKey   @"password_generator_options"
 
 // Password Generator options
 #define AppExtensionGeneratedPasswordMinLengthKey @"password_min_length"
@@ -98,5 +98,20 @@
  view, and automatically fill the HTML form fields. Supports both WKWebView and UIWebView.
  */
 - (void)fillLoginIntoWebView:(id)webView forViewController:(UIViewController *)viewController sender:(id)sender completion:(void (^)(BOOL success, NSError *error))completion;
+
+/*!
+ Called in the UIActivityViewController completion block to find if the activity was performed by 1Password Extension.
+ */
+- (BOOL)isOnePasswordExtensionActivityType:(NSString *)activityType;
+
+/*!
+ The returned NSExtensionItem can be used to create your own UIActivityViewController. Use `isOnePasswordExtensionActivityType:` and `fillReturnedItems:intoWebView:completion:` in the activity view controller completion block to process the result.
+ */
+- (void)createExtensionItemForWebView:(id)webView completion:(void (^)(NSExtensionItem *extensionItem, NSError *error))completion;
+
+/*!
+ Method used in the UIActivityViewController completion block to fill information into a web view.
+ */
+- (void)fillReturnedItems:(NSArray *)returnedItems intoWebView:(id)webView completion:(void (^)(BOOL success, NSError *error))completion;
 
 @end
