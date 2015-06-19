@@ -11,7 +11,7 @@
 
 @interface LoginViewController ()
 
-@property (weak, nonatomic) IBOutlet UIButton *onepasswordSigninButton;
+@property (weak, nonatomic) IBOutlet UIButton *onepasswordButton;
 @property (weak, nonatomic) IBOutlet UITextField *usernameTextField;
 @property (weak, nonatomic) IBOutlet UITextField *passwordTextField;
 @property (weak, nonatomic) IBOutlet UITextField *oneTimePasswordTextField;
@@ -20,9 +20,10 @@
 @implementation LoginViewController
 
 - (void)viewDidLoad {
-	[[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
+	[super viewDidLoad];
+
 	[self.view setBackgroundColor:[[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"login-background.png"]]];
-	[self.onepasswordSigninButton setHidden:![[OnePasswordExtension sharedExtension] isAppExtensionAvailable]];
+	[self.onepasswordButton setHidden:![[OnePasswordExtension sharedExtension] isAppExtensionAvailable]];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle{
@@ -32,20 +33,20 @@
 #pragma mark - Actions
 
 - (IBAction)findLoginFrom1Password:(id)sender {
-	[[OnePasswordExtension sharedExtension] findLoginForURLString:@"https://www.acme.com" forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
-		if (!loginDict) {
+	[[OnePasswordExtension sharedExtension] findLoginForURLString:@"https://www.acme.com" forViewController:self sender:sender completion:^(NSDictionary *loginDictionary, NSError *error) {
+		if (loginDictionary.count == 0) {
 			if (error.code != AppExtensionErrorCodeCancelledByUser) {
 				NSLog(@"Error invoking 1Password App Extension for find login: %@", error);
 			}
 			return;
 		}
 		
-		self.usernameTextField.text = loginDict[AppExtensionUsernameKey];
-		self.passwordTextField.text = loginDict[AppExtensionPasswordKey];
+		self.usernameTextField.text = loginDictionary[AppExtensionUsernameKey];
+		self.passwordTextField.text = loginDictionary[AppExtensionPasswordKey];
 
 		// Optional
 		// Retrive the generated one-time Password from the 1Password Login if available.
-		NSString *generatedOneTimePassword = loginDict[AppExtensionTOTPKey];
+		NSString *generatedOneTimePassword = loginDictionary[AppExtensionTOTPKey];
 		if (generatedOneTimePassword.length > 0) {
 			[self.oneTimePasswordTextField setHidden:NO];
 			self.oneTimePasswordTextField.text = generatedOneTimePassword;
